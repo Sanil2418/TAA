@@ -1,1 +1,6 @@
-yfinance sklearn.linear_model
+streamlit
+yfinance
+pandas
+numpy
+scikit-learn
+
