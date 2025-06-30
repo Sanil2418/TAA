@@ -15,20 +15,25 @@ ticker_input = st.text_input("Enter Stock Ticker (e.g., RELIANCE.NS, AAPL, TCS.N
 if st.button("Fetch Closing Price"):
     if ticker_input:
         try:
-            # Define date range (last 7 days to ensure data is returned even on weekends)
+            # Define date range (last 7 days to handle weekends/holidays)
             end_date = datetime.today()
             start_date = end_date - timedelta(days=7)
 
             # Fetch data from yfinance
-            stock_data = yf.download(ticker_input, start=start_date.strftime('%Y-%m-%d'), end=end_date.strftime('%Y-%m-%d'))
+            stock_data = yf.download(ticker_input, start=start_date, end=end_date)
 
-            # Check if data is returned
+            # Check if data exists
             if not stock_data.empty and 'Close' in stock_data.columns:
-                latest_close = stock_data['Close'].dropna().iloc[-1]
-                latest_date = stock_data.index[-1].strftime('%Y-%m-%d')
-                st.success(f"✅ Latest closing price of **{ticker_input}** on **{latest_date}** is ₹{latest_close:.2f}")
+                close_series = stock_data['Close'].dropna()
+
+                if not close_series.empty:
+                    latest_close = float(close_series.iloc[-1])
+                    latest_date = close_series.index[-1].strftime('%Y-%m-%d')
+                    st.success(f"✅ Latest closing price of **{ticker_input}** on **{latest_date}** is ₹{latest_close:.2f}")
+                else:
+                    st.error("⚠️ Closing price data not available.")
             else:
-                st.error("⚠️ No closing price data found. Please check the ticker or try a different one.")
+                st.error("⚠️ No data found for the given ticker.")
         except Exception as e:
             st.error(f"❌ Error fetching data: {str(e)}")
     else:
