@@ -1,1 +1,1 @@
-yfinance
+yfinance sklearn.linear_model
